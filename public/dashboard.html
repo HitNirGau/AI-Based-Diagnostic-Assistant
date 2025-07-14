@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+                .chatbot-logo {
+            position: fixed;
+            top: 20px;
+            right: 84%;
+            top: 2%;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .chatbot-logo i {
+            font-size: 36px;
+            color: #007bff;
+        }
+    </style>
+    <title>Dashboard</title>
+
+</head>
+
+<body>
+
+    <div class="nav">
+        <div class="sidebar-icons">
+            <span>
+                <i class="fas fa-user user-icon" onclick="openSidebar()"></i>
+                <i class="fas fa-file-medical history-icon" onclick="redirectToHistory()"></i>
+                <i class="fa fa-plus-circle user-icon" onclick="redirectToAddPatient()"></i>
+            </span>
+        </div>
+        <div class="top-bar">
+            <span>
+                Doctor's Dashboard
+            </span>
+            <div class="chatbot-logo" onclick="window.location.href='http://localhost:8501'">
+                <i class="fas fa-robot"></i>
+            </div>
+            
+        </div>
+  
+        <nav class="navi">
+         
+            <ul class="navbar-links">
+                <li class="html">
+                    <a href="#" class="html-link">
+                        Image Analysis
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                    <ul class="html-sub-menu">
+                        <li>
+                            <a href="" class="html-js-link">
+                                X-Ray
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                            <ul class="html-js-sub-menu">
+                                <li><a href="#" >Chest</a></li>
+                            </ul>
+                            
+                        </li>
+                        <li>
+                            <a href="#" class="html-js-link">
+                                Ultrasound
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                            <ul class="html-js-sub-menu">
+                                <li><a href="#" onclick="redirectToUploadXray()">Breast Cancer</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" class="html-js-link">
+                                MRI
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                            <ul class="html-js-sub-menu">
+                                <li><a href="#">Brain</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" class="html-js-link">
+                                GAP
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                            <ul class="html-js-sub-menu">
+                                <li><a href="#">Skin</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>`
+
+    </div>
+
+
+    <div id="sidePanel" class="side-panel">
+        <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()">&times;</a>
+        <div class="profile">
+            <img src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="User Image">
+            <h2>Dr. John Doe</h2>
+            <p>Specialist - Radiology</p>
+            <p>Hospital Name</p>
+        </div>
+    </div>
+
+    <div class="department-graph">
+        <select id="department" class="form-select">
+            <option value="">-- Choose Department --</option>
+            <option value="xray">X-Ray</option>
+            <option value="neurology">Neurology</option>
+            <option value="mri">MRI</option>
+        </select>
+
+        <div class="chart-container mt-5">
+            <canvas id="myChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const departmentData = {
+            xray: {
+                '0-18': { male: 15, female: 25 },
+                '19-35': { male: 40, female: 60 },
+                '36-50': { male: 55, female: 45 },
+                '51+': { male: 20, female: 30 }
+            },
+            neurology: {
+                '0-18': { male: 10, female: 15 },
+                '19-35': { male: 20, female: 25 },
+                '36-50': { male: 45, female: 50 },
+                '51+': { male: 30, female: 40 }
+            },
+            mri: {
+                '0-18': { male: 30, female: 20 },
+                '19-35': { male: 50, female: 60 },
+                '36-50': { male: 35, female: 45 },
+                '51+': { male: 15, female: 25 }
+            }
+        };
+
+
+        function updateGraph(department) {
+            const ageGroups = ['0-18', '19-35', '36-50', '51+'];
+            const maleData = [];
+            const femaleData = [];
+
+
+            if (departmentData[department]) {
+                ageGroups.forEach(group => {
+                    maleData.push(departmentData[department][group].male);
+                    femaleData.push(departmentData[department][group].female);
+                });
+            }
+
+            myChart.data.labels = ageGroups;
+            myChart.data.datasets[0].data = maleData;
+            myChart.data.datasets[1].data = femaleData;
+            myChart.update();
+        }
+
+        document.getElementById('department').addEventListener('change', function () {
+            const department = this.value;
+            updateGraph(department);
+        });
+
+   
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Male Patients',
+                    data: [],
+                    backgroundColor: '#6ea8fe',
+                    borderColor: '#1f77b4',
+                    borderWidth: 2
+                }, {
+                    label: 'Female Patients',
+                    data: [],
+                    backgroundColor: '#ff9aa2',
+                    borderColor: '#e15759',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        updateGraph('xray');
+    </script>
+    <script>$(document).ready(function () {
+            $('.dropdown-submenu a.test').on("click", function (e) {
+                $(this).next('ul').toggle();
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        });</script>
+
+  
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-content">
+                <div class="number">67</div>
+                <div class="card-name">Appointments</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-briefcase-medical"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <div class="number">8</div>
+                <div class="card-name">Departments</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-bed"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <div class="number">105</div>
+                <div class="card-name">New Patients</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-wheelchair"></i>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <title>Dashboard</title>
+    <style>
+        .chatbot-logo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .chatbot-logo i {
+            font-size: 36px;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+ 
+    <div class="chatbot-logo" onclick="window.location.href='dashboard.html'">
+        <i class="fas fa-robot"></i>
+    </div>
+
+
+    <div class="nav">
+        <div class="sidebar-icons">
+            <span>
+                <i class="fas fa-user user-icon" onclick="openSidebar()"></i>
+                <i class="fas fa-file-medical history-icon" onclick="redirectToHistory()"></i>
+                <i class="fa fa-plus-circle user-icon" onclick="redirectToAddPatient()"></i>
+            </span>
+        </div>
+        <div class="top-bar">
+            <span>Doctor's Dashboard</span>
+        </div>
+        <nav class="navi">
+            <ul class="navbar-links">
+                <li class="html">
+                    <a href="#" class="html-link">Image Analysis<i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="html-sub-menu">
+                        <li><a href="upload.html">X-Ray</a></li>
+                        <li><a href="#">Ultrasound</a></li>
+                        <li><a href="#">MRI</a></li>
+                        <li><a href="#">GAP</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-content">
+                <div class="number">67</div>
+                <div class="card-name">Appointments</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-briefcase-medical"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <div class="number">8</div>
+                <div class="card-name">Departments</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-bed"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <div class="number">105</div>
+                <div class="card-name">New Patients</div>
+            </div>
+            <div class="icon-box">
+                <i class="fas fa-wheelchair"></i>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html> -->
+

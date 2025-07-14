@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Patient</title>
+    <link rel="stylesheet" href="/addpatient.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <button class="back-button" onclick="history.back()">Go Back</button>
+    <div class="overlay"></div>
+    <div class="form-container">
+        <h2>Add New Patient</h2>
+        <form id="patientForm" method="POST">
+            <label for="doctor">Doctor's Name:</label>
+            <input type="text" id="doctor" name="doctor" required>
+
+            <label for="patient">Patient Name:</label>
+            <input type="text" id="patient" name="patient" required>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="contact">Contact:</label>
+            <input type="text" id="contact" name="contact" required>
+
+            <label for="history">Medical History:</label>
+            <textarea id="history" name="history" rows="3"></textarea>
+
+            <label for="medications">Medications:</label>
+            <textarea id="medications" name="medications" rows="3"></textarea>
+
+            <label for="allergies">Allergies:</label>
+            <textarea id="allergies" name="allergies" rows="3"></textarea>
+
+            <label for="diagnosis">Diagnosis:</label>
+            <textarea id="diagnosis" name="diagnosis" rows="3"></textarea>
+            
+
+            <button type="submit">Add Patient</button>
+        </form>
+    </div>
+    <script>
+document.getElementById('patientForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const patientData = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch('/add/addpatient', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patientData)
+        });
+
+        const rawResponse = await response.text(); // Get raw response
+        console.log('Raw Response:', rawResponse); // Debugging
+
+        const result = JSON.parse(rawResponse); // Try parsing manually
+
+        if (response.ok) {
+            alert(result.message || 'Patient added successfully!');
+            e.target.reset();
+            window.location.href = '/dash/patienthistory';
+        } else {
+            alert('Error: ' + (result.error || 'Something went wrong'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+    }
+});
+
+
+        </script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraSound Image Analysis</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/upload_aslesha.css') }}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+ .sidebar {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+       background-color: #e9f7ef;
+        padding-top: 20px;
+      }
+
+      .sidebar a {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #343a40;
+        display: block;
+      }
+
+      .sidebar a:hover {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .main-content {
+        margin-left: 270px;
+        padding: 20px;
+      }
+
+      .result-section {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .result-box {
+        width: 48%;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+
+      .llm-report {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #e9f7ef;
+      }
+
+    
+      #searchInVectorDB {
+        display: none;
+      }
+
+      .feedback-btn {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        
+
+     }
+     #uploadSection {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+
+        <button
+          class="btn btn-primary mx-4 mt-3 shadow  rounded feedback-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#feedbackModal"
+        >
+          Give Feedback
+        </button>
+
+        <div
+          class="modal fade"
+          id="feedbackModal"
+          tabindex="-1"
+          aria-labelledby="feedbackModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Your Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <textarea class="form-control" id="feedback-text" rows="4" placeholder="Write your feedback..."></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="submit-feedback">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="main-content">
+
+
+          <div class="patient-info text-center">
+            <h3>Enter Patient Name:</h3>
+            <input type="text" id="patientName" placeholder="Patient Name" class="form-control w-50 mx-auto" required>
+            <button id="proceedBtn" onclick="enableUpload()" class="btn btn-success mt-2">Proceed</button>
+        </div>
+        
+        <!-- Upload section (initially hidden) -->
+        <div id="uploadSection" style="display: none;">
+            <h4>Upload UltraSound Image:</h4>
+            <form id="uploadForm" action="http://127.0.0.1:5000/predict" method="POST" enctype="multipart/form-data">
+                <input type="file" name="imagefile" class="form-control w-50 mx-auto" required>
+                <button type="submit"  class="btn btn-primary mt-2">Upload</button>
+            </form>
+        </div>
+        
+            <!-- <div class="upload-container text-center">
+                <h2>UltraSound Image</h2>
+                <p>Please upload the UltraSound image for the patient.</p>
+                <form id="uploadForm" action="http://127.0.0.1:5000/predict" method="post" enctype="multipart/form-data">
+                    <input type="file" id="imageUpload" name="imagefile" accept="image/*" class="form-control" required>
+                    <img id="imagePreview" src="" alt="Image Preview" class="img-fluid mt-3" style="display: none;">
+                    <button type="submit" class="btn btn-primary mt-3">Predict Image</button>
+                </form> -->
+
+            </div>
+            <div class="result-container text-center mt-4">
+                <h3> {{ output }}</h3>
+            </div>
+            <div class="result-section mt-4" style="height: 500px;">
+                <div class="result-box text-center">
+                    <h4>Anomaly Detection</h4>
+                    <p style="font-weight: bold; font-size: 20px;">{{ anomaly_result }}</p>
+                    {% if anomaly_image %}
+                        <img src="{{ url_for('static', filename='anomaly/' + anomaly_image) }}" alt="Anomaly Detection" class="img-fluid mt-3">
+                    {% endif %}
+                </div>
+
+                <div class="result-box text-center" style="height: 500px;">  
+                    <h4>Grad-CAM Visualization</h4>
+                    {% if gradcam_image %}
+                        <img src="{{ gradcam_image }}" alt="Grad-CAM Heatmap" class="img-fluid mt-3" 
+                             style="width: 75%; height: 75%; object-fit: contain;">
+                    {% endif %}
+                </div>
+                
+            </div>
+
+            <div class="llm-report">
+                <h4>LLM-Generated Report</h4>
+                <p><strong>Findings:</strong> {{ report['Findings Explanation'] }}</p>
+                <p><strong>Recommendations:</strong> {{ report['Recommendations'] }}</p>
+                <p><strong>Emotional Support:</strong> {{ report['Emotional Support'] }}</p>
+            </div>
+            <br>
+            <br>
+            <div >
+                <h3>Similar Images of Input</h3>
+            <ul>
+            {% for result in searching_results %}
+            <li>Image ID: {{ result.image_id }}, Similarity: {{ result.similarity }}</li>
+            {% endfor %}
+            </ul>
+     
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+
+       function enableUpload() {
+    const patientName = document.getElementById('patientName').value.trim();
+    if (!patientName) return alert('Please enter a patient name.');
+
+    console.log(`Patient Name: ${patientName}`);
+
+    // Append the patient name as a hidden input dynamically before submission
+    document.querySelector('.patient-info').style.display = 'none';
+    document.getElementById('uploadSection').style.display = 'block';
+
+    // Add hidden input for patient name
+    const form = document.getElementById('uploadForm');
+    let patientInput = document.querySelector('input[name="patientName"]');
+
+    // Avoid adding duplicate hidden inputs
+    if (!patientInput) {
+        patientInput = document.createElement('input');
+        patientInput.type = 'hidden';
+        patientInput.name = 'patientName';
+        form.appendChild(patientInput);
+    }
+    patientInput.value = patientName;
+}
+
+
+        document.getElementById("submit-feedback").addEventListener("click", function () {
+            let feedback = document.getElementById("feedback-text").value.trim();
+            if (feedback === "") {
+              alert("Please enter some feedback before submitting.");
+            } else {
+              alert("Thank you for your feedback: " + feedback);
+              document.getElementById("feedback-text").value = ""; // Clear textarea
+              
+ 
+              let modalElement = document.getElementById("feedbackModal");
+              let modalInstance = bootstrap.Modal.getInstance(modalElement);
+              modalInstance.hide();
+            }
+        });
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const searchInVectorDB = document.getElementById('searchInVectorDB');
+
+        imageUpload.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    searchInVectorDB.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Please upload a valid image file.");
+            }
+        });
+
+        document.getElementById("uploadSearchForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            let formData = new FormData();
+            let imageInput = document.getElementById("imageInput");
+            formData.append("image", imageInput.files[0]);
+
+            fetch("/search", {
+                method: "POST",
+                body: formData
+            })
+
+            .then(response => response.json())
+            .then(data => {
+        console.log("Received Data:", data); 
+        let resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "<h3>Similar Images</h3>";
+
+        if (data.error) {
+            resultsDiv.innerHTML += `<p style="color:red;">${data.error}</p>`;
+            return;
+        }
+
+        let previewDiv = document.getElementById("preview");
+        previewDiv.innerHTML = `<h3>Uploaded Image</h3>
+                                <img src="${data.image_path}" alt="Uploaded Image" class="preview-img">`;
+
+        data.results.forEach(result => {
+            resultsDiv.innerHTML += `<p>Image ID: ${result.image_id}, Similarity: ${result.similarity.toFixed(4)}</p>`;
+        });
+        })
+
+            .catch(error => console.error("Error:", error));
+        });
+
+       
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+ 

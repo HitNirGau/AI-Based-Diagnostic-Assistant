@@ -1,0 +1,12 @@
+Doctor's Name,Patient Name,Age,Gender,Contact,Medical History,Medications,Allergies,Diagnosis,Date,Feedback
+Dr. John Smith,emily davis,29.0,Female,123-456-7890,Asthma,Albuterol,,Benign,2024-12-01,
+Dr. Sarah Johnson,michael brown,45.0,Male,987-654-3210,Hypertension,Lisinopril,Penicillin,Malignant Tumor,2024-11-15,Requires biopsy confirmation
+Dr. Alex Lee,sophia martinez,37.0,Female,456-789-1234,Diabetes,Metformin,Benign Cyst,2024-10-20,Stable condition, monitor yearly
+Dr. Emily White,james wilson,52.0,Male,321-654-9870,Heart Disease,Aspirin,Not Present,2025-01-05,Healthy, no abnormalities detected
+Dr. Mark Davis,olivia taylor,33.0,Female,789-123-4567,,Latex,Malignant Tumor,2025-02-09,Immediate surgery recommended,
+Dr. Rachel Green,william johnson,40.0,Male,654-321-7890,Arthritis,Ibuprofen,Shellfish,Benign Tumor,2024-09-12,Physical therapy advised
+Dr. David Brown,ava anderson,28.0,Female,567-890-1234,Migraine,Sumatriptan,Not Present,2025-01-20,No signs of abnormal growth,
+Dr. Laura King,ethan thomas,50.0,Male,890-123-4567,Chronic Kidney Disease,Losartan,Pollen,Benign Cyst,2024-08-18,Ultrasound in 6 months
+Dr. Kevin Wilson,isabella garcia,39.0,Female,345-678-9012,Thyroid Disorder,Levothyroxine,Malignant Tumor,2024-11-02,Further tests recommended,
+Dr. Olivia Adams,daniel martinez,46.0,Male,234-567-8901,Asthma,Montelukast,Benign Tumor,2025-02-05,Condition stable, regular check-ups
+doctor1,patient1,30.0,Male,1234567890,qwerty,asd,qw,wer,2025-02-09,

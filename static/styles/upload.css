@@ -1,0 +1,45 @@
+/* General body styling for upload pages */
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+    
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Container for the upload section */
+.container {
+    margin-top: 50px;
+}
+
+.prediction { margin-top: 200px; 
+    background-color: black; 
+    font-style: oblique; 
+    color: azure; 
+    padding: 20px; /* Adding padding for better spacing */ }
+/* Styling for the upload container */
+.upload-container {
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Image preview styling */
+#imagePreview {
+    margin-top: 20px;
+    max-width: 100%;
+    max-height: 300px;
+    display: none;
+}
+
+
+/* File input field styling */
+input[type="file"] {
+    margin-top: 20px;
+}
+
+
+
